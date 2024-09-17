@@ -6,7 +6,7 @@ quality_scalar = ScalarType("Quality")
 priority_scalar = ScalarType("Priority")
 angle_scalar = ScalarType("Angle")
 longitude_scalar = ScalarType("Longitude")
-positive_float_scalar = ScalarType("PositiveFloat")
+nonnegative_float_scalar = ScalarType("NonnegativeFloat")
 
 
 # Helper function to validate numbers
@@ -65,21 +65,21 @@ def parse_angle_literal(ast_node, variables=None):
     raise TypeError("Angle must be a numeric value.")
 
 
-@positive_float_scalar.serializer
-@positive_float_scalar.value_parser
-def parse_positive_float(value):
+@nonnegative_float_scalar.serializer
+@nonnegative_float_scalar.value_parser
+def parse_nonnegative_float(value):
     if not is_number(value):
-        raise TypeError("PositiveFloat must be a number.")
+        raise TypeError("NonnegativeFloat must be a number.")
     if value < 0:
-        raise ValueError("PositiveFloat must be a non-negative number.")
+        raise ValueError("NonnegativeFloat must be a non-negative number.")
     return value
 
 
-@positive_float_scalar.literal_parser
-def parse_positive_float_literal(ast_node, variables=None):
+@nonnegative_float_scalar.literal_parser
+def parse_nonnegative_float_literal(ast_node, variables=None):
     if isinstance(ast_node, (ast.FloatValueNode, ast.IntValueNode)):
-        return parse_positive_float(float(ast_node.value))
-    raise TypeError("PositiveFloat must be a numeric value.")
+        return parse_nonnegative_float(float(ast_node.value))
+    raise TypeError("NonnegativeFloat must be a numeric value.")
 
 
 @priority_scalar.serializer
