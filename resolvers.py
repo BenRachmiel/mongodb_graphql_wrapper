@@ -7,15 +7,19 @@ def resolve_retrieve_recent_history(_, info, limit=None):
 
 def resolve_retrieve_query(_, info, name):
     query = {"name": {"$regex": name, "$options": "i"}}
-
     result = info.context['db'].queries.find_one(query)
-
     return result
 
 
 def resolve_save_query(_, info, input):
-    # Insert the new data into MongoDB
-    insert_result = info.context['db'].queries.insert_one(input)
-
-    # Return the inserted object's ID
-    return str(insert_result.inserted_id)
+    query = {"name": input.get("name")}  # Assuming "name" is a unique identifier
+    update_result = info.context['db'].queries.update_one(
+        query,
+        {"$set": input},
+        upsert=True  # This ensures insertion if no document matches the query
+    )
+    if update_result.upserted_id:
+        output = f'New item added: {input.get("name")}'
+    else:
+        output = f'Item overwritten: {input.get("name")}'
+    return output
